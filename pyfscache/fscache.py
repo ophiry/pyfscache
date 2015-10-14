@@ -6,6 +6,7 @@ import cPickle
 import time
 import base64
 import inspect
+import copy
 
 __all__ = ["CacheError", "FSCache", "make_digest",
            "auto_cache_function", "cache_function", "to_seconds"]
@@ -425,7 +426,7 @@ def auto_cache_function(f, cache):
   except (AttributeError, TypeError):
     fid = (f.__name__, repr(type(f)))
   def _f(*args, **kwargs):
-    k = (fid, args, kwargs)
+    k = copy.deepcopy((fid, args, kwargs))
     if k in cache:
       result = cache[k]
     else:
@@ -447,7 +448,7 @@ def cache_function(f, keyer, cache):
   It is best to have a unique `keyer` for every function.
   """
   def _f(*args, **kwargs):
-    k = keyer(*args, **kwargs)
+    k = copy.deepcopy(keyer(*args, **kwargs))
     if k in cache:
       result = cache[k]
     else:
